@@ -1,0 +1,80 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: wsserver-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: wss.build.lan
+      http:
+        paths:
+          - backend:
+              serviceName: wsserver
+              servicePort: 9001
+            path: /
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wsserver
+  namespace: default
+  labels:
+    app: wsserver
+spec:
+  ports:
+    - port: 9001
+  clusterIP: None
+  selector:
+    app: wsserver
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wsserver
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: wsserver
+  replicas: 1
+  strategy:
+    type: "Recreate"
+  template:
+    metadata:
+      labels:
+        app: wsserver
+        commitHash: __VERSION__
+    spec:
+      imagePullSecrets:
+        - name: regsecret
+      containers:
+        - image: upachko/site-builder-websocket:latest
+          name: wsserver
+          env:
+            - name: PRODUCTION
+              valueFrom:
+                configMapKeyRef:
+                  name: server-type
+                  key: PRODUCTION
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: wsserver-default
+                  key: PORT
+            #redis
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-default
+                  key: HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-default
+                  key: PORT
+          lifecycle:
+            postStart:
+              exec:
+                command: ["sh", "/var/SiteBuilderWebsocket/startProcess.sh", "app"]

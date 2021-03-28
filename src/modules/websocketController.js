@@ -30,15 +30,19 @@ module.exports.start = function (server) {
         });
     });
 
-    io.on('connection', (socket) => {
-        const { user } = socket.handshake;
-        logger.info(`Socket is connect: ${JSON.stringify(socket.handshake.user)}`);
-        socket.on('disconnect', () => {
-            logger.info('Socket is disconnect');
+    io.on('connection', (client) => {
+        const { user } = client.handshake;
+        logger.info(`client is connect: ${JSON.stringify(user)}`);
+        client.on('disconnect', () => {
+            logger.info('client is disconnect');
         });
-        socket.on('builder', (data) => {
-            logger.debug('builder');
-            io.emit('builder', data);
-        });
+        if (user.rights && user.rights.sites===2) {
+            client.on('builder', (data) => {
+                logger.debug('builder');
+                io.to('sites').emit('builder',data);
+            });
+            logger.info(`client: "${user.name}" join to room sites`)
+            client.join('sites')
+        }
     });
 };

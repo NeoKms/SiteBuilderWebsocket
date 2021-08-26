@@ -19,8 +19,8 @@ module.exports.start = function (server) {
             logger.error('Not session found');
         }
         redis.get(`sess:${sid}`, (err, data) => {
-            if (err) {
-                logger.error('io.authorization -> ', err);
+            if (err || !data) {
+                logger.error('cookie -> ',sidCookie,'io.authorization -> ', err);
                 next(new Error('not authorized'));
             }
             if (data) {

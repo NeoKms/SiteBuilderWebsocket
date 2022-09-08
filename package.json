@@ -6,12 +6,8 @@
   "scripts": {
     "dev": "nodemon app.js --ignore 'upload/*",
     "start": "node app.js",
-    "apidoc": "apidoc -i src/ -o doc/"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "upload/sites/*"
-    ]
+    "prepare": "husky install",
+    "eslint-fix": "eslint --fix ."
   },
   "dependencies": {
     "@sentry/node": "^7.12.1",
@@ -35,6 +31,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-react": "^7.31.7",
+    "husky": "^8.0.1",
     "nodemon": "^2.0.19"
   }
 }

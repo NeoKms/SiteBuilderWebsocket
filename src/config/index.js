@@ -1,24 +1,25 @@
 const {env} = process;
 
-const PRODUCTION = String(env.PRODUCTION || false).toLowerCase() == "true"
+const config = {};
+
+config.PRODUCTION = String(env.PRODUCTION || false).toLowerCase() == "true"
 
 //only dev//
-if (!PRODUCTION) {
+if (!config.PRODUCTION) {
     const dotenv = require('dotenv');
     dotenv.config();
 }
 //
 
-const PORT = env.PORT
+config.PORT = env.PORT
 
-const REDIS = {
+config.REDIS = {
     HOST: env.REDIS_HOST,
     PORT: env.REDIS_PORT,
     SECRET: 'W*W(7fhsjDK&A*Eh',
     KEY: 'connect.sid',
 };
 
-module.exports = {
-    PORT,
-    REDIS,
-};
+config.COOKIE_DOMAIN = env.COOKIE_DOMAIN;
+
+module.exports = config;
